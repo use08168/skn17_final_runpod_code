@@ -19,10 +19,14 @@ checkpoints/
 *.safetensors
 
 # === baseball_pipeline 안의 데이터/로그/중간 출력 ===
-baseball_pipeline/data/
 baseball_pipeline/logs/
 baseball_pipeline/outputs/
 baseball_pipeline/**/__pycache__/
 baseball_pipeline/**/.ipynb_checkpoints/
 
 # === 기타 큰 파일들 필요시 여기 추가 ===
+
+# baseball_pipeline data: 구조만 공유, 내용은 무시
+baseball_pipeline/data/**
+!baseball_pipeline/data/.gitkeep
+!baseball_pipeline/data/*/.gitkeep
