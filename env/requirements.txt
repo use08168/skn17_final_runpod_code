@@ -44,8 +44,6 @@ fastapi==0.121.3
 ffmpy==1.0.0
 filelock==3.19.1
 fire==0.7.1
-# Editable install with no version control (fish-speech==0.1.0)
--e /workspace/baseball_pipeline/fish-speech
 flatbuffers==25.9.23
 flatten-dict==0.4.2
 fonttools==4.60.1
