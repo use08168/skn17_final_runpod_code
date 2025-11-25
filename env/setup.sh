@@ -1,3 +1,6 @@
+cd /workspace/skn17_final_runpod_code
+
+cat << 'EOF' > env/setup.sh
 #!/usr/bin/env bash
 set -e
 
@@ -6,58 +9,47 @@ KERNEL_DISPLAY_NAME="skn17_final_env (Runpod)"
 
 echo "[setup] 프로젝트 환경: ${PROJECT_ENV_NAME}"
 
+MINICONDA_DIR="$HOME/miniconda3"
+CONDA_BIN="${MINICONDA_DIR}/bin/conda"
+
 # -----------------------------
-# 1) conda 초기화
+# 1) conda 존재 여부 확인
 # -----------------------------
-if [ -z "$CONDA_EXE" ]; then
-  if [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]; then
-    . "$HOME/miniconda3/etc/profile.d/conda.sh"
-  elif [ -f "$HOME/miniconda/etc/profile.d/conda.sh" ]; then
-    . "$HOME/miniconda/etc/profile.d/conda.sh"
-  elif command -v conda &> /dev/null; then
-    . "$(conda info --base)/etc/profile.d/conda.sh"
-  else
-    echo "[ERROR] conda를 찾을 수 없습니다. 먼저 Miniconda를 설치하세요."
-    echo "  예시:"
-    echo "    cd /workspace"
-    echo "    curl -L https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -o miniconda.sh"
-    echo "    bash miniconda.sh -b -p \$HOME/miniconda3"
-    echo "    source \$HOME/miniconda3/etc/profile.d/conda.sh"
-    exit 1
-  fi
+if [ ! -x "${CONDA_BIN}" ]; then
+  echo "[ERROR] ${CONDA_BIN} 을(를) 찾을 수 없습니다."
+  echo "        먼저 Miniconda를 설치해야 합니다."
+  echo "        (cd /workspace && curl -L https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -o miniconda.sh && bash miniconda.sh -b -p \$HOME/miniconda3)"
+  exit 1
 fi
 
 # -----------------------------
-# 2) conda env 생성/재사용
+# 2) env 존재 여부 확인 후 생성/재사용
 # -----------------------------
-if conda env list | grep -q "^${PROJECT_ENV_NAME} "; then
+if "${CONDA_BIN}" env list | grep -q "^${PROJECT_ENV_NAME} "; then
   echo "[setup] 기존 env 발견 → ${PROJECT_ENV_NAME} 재사용"
 else
   echo "[setup] 새 env 생성 → ${PROJECT_ENV_NAME}"
-  conda create -n "${PROJECT_ENV_NAME}" python=3.10 -y
+  "${CONDA_BIN}" create -n "${PROJECT_ENV_NAME}" python=3.10 -y
 fi
 
-echo "[setup] env 활성화"
-conda activate "${PROJECT_ENV_NAME}"
-
 # -----------------------------
-# 3) pip 패키지 설치
+# 3) env 안에서 pip 설치 (conda run 사용)
 # -----------------------------
-echo "[setup] pip 업그레이드"
-pip install --upgrade pip
+echo "[setup] env 내부에서 pip 업그레이드"
+"${CONDA_BIN}" run -n "${PROJECT_ENV_NAME}" python -m pip install --upgrade pip
 
 if [ -f "env/requirements.txt" ]; then
   echo "[setup] env/requirements.txt 기반 패키지 설치"
-  pip install -r env/requirements.txt
+  "${CONDA_BIN}" run -n "${PROJECT_ENV_NAME}" python -m pip install -r env/requirements.txt
 else
   echo "[WARN] env/requirements.txt 를 찾을 수 없습니다."
 fi
 
 # -----------------------------
-# 4) Jupyter 커널 등록
+# 4) Jupyter 커널 등록 (역시 env 안에서 실행)
 # -----------------------------
 echo "[setup] Jupyter 커널 등록"
-python -m ipykernel install --user --name "${PROJECT_ENV_NAME}" --display-name "${KERNEL_DISPLAY_NAME}"
+"${CONDA_BIN}" run -n "${PROJECT_ENV_NAME}" python -m ipykernel install --user --name "${PROJECT_ENV_NAME}" --display-name "${KERNEL_DISPLAY_NAME}"
 
 # -----------------------------
 # 5) /workspace/baseball_pipeline 심볼릭 링크 생성
@@ -82,3 +74,6 @@ echo "[DONE] 기본 환경 설정 완료."
 echo " - conda env : ${PROJECT_ENV_NAME}"
 echo " - 커널 이름 : ${KERNEL_DISPLAY_NAME}"
 echo " - pipeline  : ${PIPELINE_DIR} (→ ${LINK_TARGET})"
+EOF
+
+chmod +x env/setup.sh
