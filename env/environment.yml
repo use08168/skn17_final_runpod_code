@@ -1,0 +1,6 @@
+name: baseball_pipe
+channels:
+  - defaults
+dependencies:
+  - python=3.10
+prefix: /workspace/miniconda3/envs/baseball_pipe

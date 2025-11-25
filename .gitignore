@@ -1,0 +1,28 @@
+# === Python / Jupyter 캐시 ===
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+
+# === 가상환경 / 빌드 아티팩트 ===
+.env/
+venv/
+*.egg-info/
+dist/
+build/
+
+# === 모델 가중치/체크포인트 (어디에 있든) ===
+checkpoints/
+models/
+*.pt
+*.pth
+*.bin
+*.safetensors
+
+# === baseball_pipeline 안의 데이터/로그/중간 출력 ===
+baseball_pipeline/data/
+baseball_pipeline/logs/
+baseball_pipeline/outputs/
+baseball_pipeline/**/__pycache__/
+baseball_pipeline/**/.ipynb_checkpoints/
+
+# === 기타 큰 파일들 필요시 여기 추가 ===
