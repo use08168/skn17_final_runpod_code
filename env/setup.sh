@@ -18,7 +18,10 @@ CONDA_BIN="${MINICONDA_DIR}/bin/conda"
 if [ ! -x "${CONDA_BIN}" ]; then
   echo "[ERROR] ${CONDA_BIN} 을(를) 찾을 수 없습니다."
   echo "        먼저 Miniconda를 설치해야 합니다."
-  echo "        (cd /workspace && curl -L https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -o miniconda.sh && bash miniconda.sh -b -p \$HOME/miniconda3)"
+  echo "        예시:"
+  echo "          cd /workspace"
+  echo "          curl -L https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -o miniconda.sh"
+  echo "          bash miniconda.sh -b -p \$HOME/miniconda3"
   exit 1
 fi
 
@@ -33,11 +36,23 @@ else
 fi
 
 # -----------------------------
-# 3) env 안에서 pip 설치 (conda run 사용)
+# 3) env 안에서 pip 업그레이드
 # -----------------------------
 echo "[setup] env 내부에서 pip 업그레이드"
 "${CONDA_BIN}" run -n "${PROJECT_ENV_NAME}" python -m pip install --upgrade pip
 
+# -----------------------------
+# 4) PyTorch(CUDA 12.1) 설치
+#    (requirements.txt 에서 torch/torchvision/torchaudio 는 제거된 상태여야 함)
+# -----------------------------
+echo "[setup] PyTorch (CUDA 12.1) 설치"
+"${CONDA_BIN}" run -n "${PROJECT_ENV_NAME}" python -m pip install \
+  --index-url https://download.pytorch.org/whl/cu121 \
+  "torch==2.5.1" torchvision torchaudio
+
+# -----------------------------
+# 5) 나머지 requirements 설치
+# -----------------------------
 if [ -f "env/requirements.txt" ]; then
   echo "[setup] env/requirements.txt 기반 패키지 설치"
   "${CONDA_BIN}" run -n "${PROJECT_ENV_NAME}" python -m pip install -r env/requirements.txt
@@ -46,13 +61,14 @@ else
 fi
 
 # -----------------------------
-# 4) Jupyter 커널 등록 (역시 env 안에서 실행)
+# 6) Jupyter 커널 등록 (env 안에서 실행)
 # -----------------------------
 echo "[setup] Jupyter 커널 등록"
-"${CONDA_BIN}" run -n "${PROJECT_ENV_NAME}" python -m ipykernel install --user --name "${PROJECT_ENV_NAME}" --display-name "${KERNEL_DISPLAY_NAME}"
+"${CONDA_BIN}" run -n "${PROJECT_ENV_NAME}" python -m ipykernel install \
+  --user --name "${PROJECT_ENV_NAME}" --display-name "${KERNEL_DISPLAY_NAME}"
 
 # -----------------------------
-# 5) /workspace/baseball_pipeline 심볼릭 링크 생성
+# 7) /workspace/baseball_pipeline 심볼릭 링크 생성
 # -----------------------------
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.."; pwd)"
 PIPELINE_DIR="${REPO_ROOT}/baseball_pipeline"
