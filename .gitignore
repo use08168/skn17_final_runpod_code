@@ -12,7 +12,7 @@ build/
 
 # === 모델 가중치/체크포인트 (어디에 있든) ===
 checkpoints/
-models/
+/models/
 *.pt
 *.pth
 *.bin
