@@ -1,5 +1,4 @@
 cd /workspace/skn17_final_runpod_code
-
 cat << 'EOF' > env/setup.sh
 #!/usr/bin/env bash
 set -e
@@ -61,14 +60,23 @@ else
 fi
 
 # -----------------------------
-# 6) Jupyter 커널 등록 (env 안에서 실행)
+# 6) 추가 패키지 설치
+# -----------------------------
+echo "[setup] audio_separator 설치"
+"${CONDA_BIN}" run -n "${PROJECT_ENV_NAME}" python -m pip install audio_separator
+
+echo "[setup] bitsandbytes 업그레이드"
+"${CONDA_BIN}" run -n "${PROJECT_ENV_NAME}" python -m pip install -U bitsandbytes
+
+# -----------------------------
+# 7) Jupyter 커널 등록 (env 안에서 실행)
 # -----------------------------
 echo "[setup] Jupyter 커널 등록"
 "${CONDA_BIN}" run -n "${PROJECT_ENV_NAME}" python -m ipykernel install \
   --user --name "${PROJECT_ENV_NAME}" --display-name "${KERNEL_DISPLAY_NAME}"
 
 # -----------------------------
-# 7) /workspace/baseball_pipeline 심볼릭 링크 생성
+# 8) /workspace/baseball_pipeline 심볼릭 링크 생성
 # -----------------------------
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.."; pwd)"
 PIPELINE_DIR="${REPO_ROOT}/baseball_pipeline"
@@ -87,9 +95,10 @@ fi
 
 echo
 echo "[DONE] 기본 환경 설정 완료."
-echo " - conda env : ${PROJECT_ENV_NAME}"
-echo " - 커널 이름 : ${KERNEL_DISPLAY_NAME}"
-echo " - pipeline  : ${PIPELINE_DIR} (→ ${LINK_TARGET})"
+echo " - conda env      : ${PROJECT_ENV_NAME}"
+echo " - 커널 이름      : ${KERNEL_DISPLAY_NAME}"
+echo " - pipeline       : ${PIPELINE_DIR} (→ ${LINK_TARGET})"
+echo " - 추가 패키지    : audio_separator, bitsandbytes"
 EOF
 
 chmod +x env/setup.sh
