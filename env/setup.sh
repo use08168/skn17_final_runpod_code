@@ -76,29 +76,20 @@ echo "[setup] Jupyter 커널 등록"
   --user --name "${PROJECT_ENV_NAME}" --display-name "${KERNEL_DISPLAY_NAME}"
 
 # -----------------------------
-# 8) /workspace/baseball_pipeline 심볼릭 링크 생성
+# 8) 완료 메시지
 # -----------------------------
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.."; pwd)"
-PIPELINE_DIR="${REPO_ROOT}/baseball_pipeline"
-LINK_TARGET="/workspace/baseball_pipeline"
-
-if [ -d "${PIPELINE_DIR}" ]; then
-  if [ ! -e "${LINK_TARGET}" ]; then
-    echo "[setup] ${LINK_TARGET} → ${PIPELINE_DIR} 심볼릭 링크 생성"
-    ln -s "${PIPELINE_DIR}" "${LINK_TARGET}"
-  else
-    echo "[setup] ${LINK_TARGET} 이미 존재 → 링크 생성 스킵"
-  fi
-else
-  echo "[WARN] 레포 안에 baseball_pipeline 디렉토리가 없습니다."
-fi
+PIPELINE_DIR="${REPO_ROOT}"
 
 echo
 echo "[DONE] 기본 환경 설정 완료."
 echo " - conda env      : ${PROJECT_ENV_NAME}"
 echo " - 커널 이름      : ${KERNEL_DISPLAY_NAME}"
-echo " - pipeline       : ${PIPELINE_DIR} (→ ${LINK_TARGET})"
+echo " - pipeline       : ${PIPELINE_DIR}"
 echo " - 추가 패키지    : audio_separator, bitsandbytes"
+echo
+echo "⚠️  중요: 실제 경로는 /workspace/skn17_final_runpod_code/baseball_pipeline 입니다."
+echo "   심볼릭 링크를 사용하지 않으므로 모든 코드에서 실제 경로를 사용하세요."
 EOF
 
 chmod +x env/setup.sh
